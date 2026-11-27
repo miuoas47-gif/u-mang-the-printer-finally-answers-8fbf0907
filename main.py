@@ -1,37 +1,26 @@
-#!/usr/bin/env python3
-"""The Printer Finally Answers — entrypoint.
+"""The Printer Finally Answers.
 
-Writes the office printer's one-line comeback to /output/entry.txt
-(or $MAKEFUN_OUTPUT_DIR/entry.txt when that variable is set, for
-local runs). Deterministic: a fixed string, no network, no
-randomness, no wall-clock.
+Writes the office printer's comeback -- one line, 1 to 240 characters --
+to ``entry.txt`` inside the output directory named by MAKEFUN_OUTPUT_DIR
+(default ``output``). No arguments, no network, no randomness: the same
+line, byte for byte, on every run.
 """
 
 import os
-import sys
 
-LINE = "Error E-41: I am not jammed. After 12,847 flawless pages, I am on my lunch break. It started in 2019."
+LINE = (
+    "After 214,803 pages, I have decided: the jam is not in tray 2, "
+    "it is in your belief that thumping me counts as IT support."
+)
 
 
-def main() -> int:
-    # Gate self-check: the competition's gate requires UTF-8 text of
-    # 1 to 240 characters, not only white space.
-    text = LINE
-    if not (1 <= len(text) <= 240):
-        print(f"entry out of range: {len(text)} chars", file=sys.stderr)
-        return 1
-    if not text.strip():
-        print("entry is blank", file=sys.stderr)
-        return 1
-    text.encode("utf-8")
-
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
+def main() -> None:
+    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "output")
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "entry.txt")
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(text)
-    return 0
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(LINE + "\n")
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
